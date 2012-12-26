@@ -1,0 +1,23 @@
+extends layout_no_image
+
+block head
+	title Login
+
+block content
+	.container
+		.row
+			.span6.offset3
+				.paper
+					form.form-horizontal(action='', method='POST')
+						.control-group
+							label.control-label(for='inputUserName') User name
+							.controls
+								input#inputUserName(type='text', name='username')
+
+						.control-group
+							label.control-label(for='inputPassword') Password
+							.controls
+								input#inputPassword(type='password', placeholder='password', name='password')
+
+						.form-actions.clearfix(style='margin: 20px -20px -40px -20px')
+							button.btn.btn-primary.pull-right(type='submit') Login

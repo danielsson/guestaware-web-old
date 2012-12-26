@@ -1,0 +1,112 @@
+extends layout
+
+block head
+	title Home
+
+block nav
+	- int g = 45;
+	- if (g > 20)
+		li.pull-right
+			a(href='/login') Login with facebook
+
+
+
+block content
+	//- The carousel
+	#myCarousel.carousel.slide
+		.carousel-inner
+			.item.active(style='background-image: url(/img/banquet.jpg)')
+				.container
+					.carousel-caption
+						h1 Manage your guests efficiently
+						p.lead Dolor sit amet
+
+						a.btn.btn-large.btn-primary(href='login')
+							| Login with facebook
+
+	//- Marketing messages and featurettes
+	.container.marketing.paper
+		.row
+			.span4
+				img.img-circle(src='http://placehold.it/140x140')
+				h2 Heading
+				p Donec sed odio dui. Etiam porta sem malesuada
+					| magna mollis euismod. Nullam id dolor id
+					| nibh ultricies vehicula ut id elit. Morbi
+					| leo risus, porta ac consectetur ac,
+					| vestibulum at eros. Praesent commodo
+					| cursus magna, vel scelerisque nisl
+					| consectetur et.
+				p
+					a.btn(href='#') View details
+
+			.span4
+				img.img-circle(src='http://placehold.it/140x140')
+				h2 Heading
+				p Donec sed odio dui. Etiam porta sem malesuada
+					| magna mollis euismod. Nullam id dolor id
+					| nibh ultricies vehicula ut id elit. Morbi
+					| leo risus, porta ac consectetur ac,
+					| vestibulum at eros. Praesent commodo
+					| cursus magna, vel scelerisque nisl
+					| consectetur et.
+				p
+					a.btn(href='#') View details
+					
+			.span4
+				img.img-circle(src='http://placehold.it/140x140')
+				h2 Heading
+				p Donec sed odio dui. Etiam porta sem malesuada
+					| magna mollis euismod. Nullam id dolor id
+					| nibh ultricies vehicula ut id elit. Morbi
+					| leo risus, porta ac consectetur ac,
+					| vestibulum at eros. Praesent commodo
+					| cursus magna, vel scelerisque nisl
+					| consectetur et.
+				p
+					a.btn(href='#') View details
+		
+		hr.featurette-divider
+
+		.featurette
+			img.featurette-image.pull-right
+			h2.featurette-heading
+				| First featurette heading wool
+				span.muted blow your mind
+			p.lead
+				| Magna mollis euismod. Nullam id dolor id
+				| nibh ultricies vehicula ut id elit. Morbi
+				| leo risus, porta ac consectetur ac,
+				| vestibulum at eros. Praesent commodo
+				| cursus magna, vel scelerisque nisl
+				| consectetur et.
+		.featurette
+			img.featurette-image.pull-right
+			h2.featurette-heading
+				| First featurette heading wool
+				span.muted blow your mind
+			p.lead
+				| Magna mollis euismod. Nullam id dolor id
+				| nibh ultricies vehicula ut id elit. Morbi
+				| leo risus, porta ac consectetur ac,
+				| vestibulum at eros. Praesent commodo
+				| cursus magna, vel scelerisque nisl
+				| consectetur et.
+		.featurette
+			img.featurette-image.pull-right
+			h2.featurette-heading
+				| First featurette heading wool
+				span.muted blow your mind
+			p.lead
+				| Magna mollis euismod. Nullam id dolor id
+				| nibh ultricies vehicula ut id elit. Morbi
+				| leo risus, porta ac consectetur ac,
+				| vestibulum at eros. Praesent commodo
+				| cursus magna, vel scelerisque nisl
+				| consectetur et.
+				
+		footer
+			p.pull-right
+				a(href='#') Back to top
+			p &copy; 2012 GuestAware &middot;
+				a(href='#') Terms

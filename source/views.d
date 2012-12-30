@@ -1,30 +1,59 @@
 module views;
+import std.array;
+import std.variant;
 import vibe.d;
+import mysql.db;
+import models;
 
 void index(HttpServerRequest req, HttpServerResponse res) {
 	res.render!("index.dt");
 }
 
 void home(HttpServerRequest req, HttpServerResponse res) {
-	res.render!("home.dt");
+	auto user = GAUser.fromString(req.session["user"]);
+	auto con = DBContainer.instance.lockConnection();
+
+	auto events = GAEvent.byUser(con, user);
+
+	res.render!("home.dt", events);
 }
 
 void login(HttpServerRequest req, HttpServerResponse res) {
-	switch(req.method) {
-	case HttpMethod.GET:
-		res.render!("login.dt");
-		break;
-	case HttpMethod.POST:
-		auto session = res.startSession();
-		
-		session["username"] = req.form["username"];
-		session["password"] = req.form["password"];
-		session["userlevel"] = "1";
-
+	if(! (req.session is null)) { // There is already a session in place
 		res.redirect("/home");
+		return;
+	}
+
+	string error = "";
+
+	switch(req.method) {
+	case HttpMethod.POST:
+
+		auto con = DBContainer.instance.lockConnection();
+
+		auto users = GAUser.byUsername(con, req.form["username"]);
+
+		if(users.length == 1 && users[0].passwordEquals(req.form["password"])) {
+			// The username existed and the password matches
+			auto session = res.startSession();
+
+			session["user"] = users[0].toString();
+
+			res.redirect("/home");
+			return;
+		}
+
+		error = "Unknown username/password";
+		goto case;
+	case HttpMethod.GET:
+		res.render!("login.dt", error);
 		break;
 	default:
 		throw new HttpStatusException(405, "Unsupported request method");
 	}
 	
+}
+
+void showEvent(HttpServerRequest req, HttpServerResponse res) {
+	return;
 }

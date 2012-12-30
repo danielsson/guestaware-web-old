@@ -8,6 +8,9 @@ block content
 		.row
 			.span6.offset3
 				.paper
+					- if(!error.empty)
+						.alert.alert-block= error
+						
 					form.form-horizontal(action='', method='POST')
 						.control-group
 							label.control-label(for='inputUserName') User name

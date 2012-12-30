@@ -8,16 +8,15 @@ block content
 		.row
 			.span6.offset3
 				.paper.clearfix
+
 					ul.nav.nav-tabs.nav-stacked
-						li
-							a(href='#') Event name
-								small.pull-right Venue
-						li
-							a(href='#') Event name
-								small.pull-right Venue
-						li
-							a(href='#') Event name
-								small.pull-right Venue
+						- import models;
+						- import std.conv;
+						- foreach(ref GAEvent evt; events)
+							li
+								|!= "<a href=/event/" ~ to!string(evt.id) ~ ">"
+								|!= evt.venue
+								|!= "<small class=pull-right>" ~ evt.venue ~ "</small>"
 					
 					button.btn.pull-right(role='button', data-toggle='modal', href='#create')
 						| New Event
@@ -47,3 +46,4 @@ block content
 		.modal-footer
 			button.btn(data-dismiss='modal', aria-hidden='true') Close
 			button.btn.btn-primary Save Changes
+			

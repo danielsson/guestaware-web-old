@@ -15,7 +15,7 @@ block content
 	//- The carousel
 	#myCarousel.carousel.slide
 		.carousel-inner
-			.item.active(style='background-image: url(/img/banquet.jpg)')
+			.item.active
 				.container
 					.carousel-caption
 						h1 Manage your guests efficiently

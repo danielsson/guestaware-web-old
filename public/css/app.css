@@ -85,6 +85,17 @@ h1,h2,h3,h4 {
 	height: 500px;
 	-webkit-background-size: cover;
 	background-repeat: no-repeat;
+	background-position: center center;
+}
+@media (min-width: 979px) {
+	.carousel .item {
+		background-image: url(/img/banquet.jpg)
+	}
+}
+@media (max-width: 979px) {
+	.carousel .item {
+		background-image: url(/img/banquet_small.jpg)
+	}
 }
 .carousel img {
 

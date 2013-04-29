@@ -10,13 +10,16 @@ block content
 				.paper.clearfix
 
 					ul.nav.nav-tabs.nav-stacked
-						- import models;
-						- import std.conv;
+						- import models : GAEvent;
+						- import std.conv : to;
 						- foreach(ref GAEvent evt; events)
 							li
+								//- Why cant i do this in jade?!
 								|!= "<a href=/event/" ~ to!string(evt.id) ~ ">"
-								|!= evt.venue
-								|!= "<small class=pull-right>" ~ evt.venue ~ "</small>"
+								|= evt.name
+								|!= "<small class=pull-right>"
+								|= evt.venue
+								|!= "</small></a>"
 					
 					button.btn.pull-right(role='button', data-toggle='modal', href='#create')
 						| New Event

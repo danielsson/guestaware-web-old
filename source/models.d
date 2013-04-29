@@ -22,6 +22,47 @@ struct DBContainer {
 		return _db;
 	}
 }
+
+/// Selector
+struct Select {
+	static ModelSet!T byId(T)(Connection con, uint id) {
+		return where!T(con, " WHERE id = ? LIMIT 1;", Variant(id));
+	}
+
+	static ModelSet!T whereEquals(T)(Connection con, string field, Variant va) {
+		return where!T(con, " WHERE "~field~" = ?;", va);
+	}
+
+	static ModelSet!T where(T)(Connection con, string whereStr, Variant[] va ...) {
+		auto cmd = Command(con, T.MYX_SEL_QUERY ~ whereStr);
+		cmd.prepare();
+		cmd.bindParameters(va);
+
+		return ModelSet!T(cmd);
+	}
+}
+
+struct Insert {
+	static bool model(T)(Connection con, T t) {
+		auto cmd = Command(con, "INSERT INTO " ~ T.MYX_INSERT);
+		cmd.prepare();
+		cmd.bindParameters(t.toVariant());
+
+		return cmd.execPrepared();
+	}
+}
+
+struct Update {
+	static bool model(T)(Connection con, T t) {
+		auto cmd = Command(con,
+			"UPDATE " ~ T.MYX_UPDATE ~ " WHERE id=? LIMIT 1;");
+		cmd.prepare();
+		cmd.bindParameters(t.toVariant() ~ Variant(t.id));
+
+		return cmd.execPrepared();
+	}
+}
+
 /**
  * This is a iterator for a ResultSet that returns the rows
  * as a struct of the type T.
@@ -36,9 +77,9 @@ struct DBContainer {
  */
 struct ModelSet(T)
 {
-private:
-	ResultSet	_results;
-	T			_t;
+
+public	ResultSet	_results;
+private	T			_t;
 
 public:
 	this(ResultSet rs) {
@@ -73,6 +114,8 @@ public:
 	}
 }
 
+
+
 /**
  * Functions to manage events
  */
@@ -85,37 +128,19 @@ struct GAEvent {
 	string venue;
 	DateTime date;
 
-	static const string MYX_SEL_QUERY = "SELECT * FROM ga_event";
-	static const string MYX_INSERT_QUERY =
-		"INSERT INTO ga_event (name, venue, date) VALUES (?, ?, ?)";
-	
-	static GAEvent byId(Connection con, uint id) {
-		auto cmd = Command(con, MYX_SEL_QUERY ~ " WHERE id = ? LIMIT 1;");
-		cmd.prepare();
-
-		Variant[1] va;
-		va[0] = id;
-		cmd.bindParameters(va);
-		
-		auto results = cmd.execPreparedResult();
-
-		if (results.length == 0) 
-			throw new Exception("Not found");
-
-		GAEvent evt;
-		results[0].toStruct!GAEvent(evt);
-		return evt;
+	Variant[] toVariant() {
+		return variantArray(uid, name, venue, date);
 	}
 
-	static ModelSet!GAEvent byUser(Connection con, ref GAUser user) {
-		auto cmd = Command(con, MYX_SEL_QUERY ~ " WHERE uid = ?;");
-		cmd.prepare();
+static:
+	const string MYX_SEL_QUERY = "SELECT * FROM ga_event";
+	const string MYX_INSERT =
+		"ga_event (uid, name, venue, date) VALUES (?,?,?,?)";
+	const string MYX_UPDATE =
+		"ga_event SET uid=?, name=?, venue=?, date=?";
 
-		Variant[1] va;
-		va[0] = user.id;
-		cmd.bindParameters(va);
-
-		return ModelSet!GAEvent(cmd);
+	ModelSet!GAEvent byUser(Connection con, ref GAUser user) {
+		return Select.whereEquals!GAEvent(con, "uid", Variant(user.id));
 	}
 }
 
@@ -123,14 +148,32 @@ struct GAEvent {
 /// Guests
 struct GAGuest {
 	uint id;
+	uint eid;
 	string name;
-	bool checkedIn;
-}
+	string email;
+	string phone;
+	string note;
+	ushort checked;
 
+	Variant[] toVariant() {
+		return variantArray(eid, name, email, phone, note, checked);
+	}
+
+static:
+	const string MYX_SEL_QUERY = "SELECT * FROM ga_guest";
+	const string MYX_INSERT =
+		"ga_guest (eid, name, email, phone, note, checked) VALUES (?,?,?,?,?,?)";
+	const string MYX_UPDATE =
+		"ga_guest SET eid=?, name=?, email=?, phone=?, note=?, checked=?";
+
+	ModelSet!GAGuest byEvent(Connection con, GAEvent evt) {
+		return Select.whereEquals!GAGuest(con, "eid", Variant(evt.id));
+	} 
+}
 
 struct GAUser {
 	uint id;
-	string username;
+-	string username;
 	string password; // This must be the hash
 
 
@@ -147,31 +190,20 @@ struct GAUser {
 		return id.to!(string)() ~ "|$$|" ~ username ~ "|$$|" ~ password;
 	}
 
-static:
-	const string MYX_SEL_QUERY = "SELECT * FROM ga_user";
-	const string MYX_INSERT_QUERY =
-		"INSERT INTO ga_user (username, password) VALUES (?, ?)";
-
-	ModelSet!GAUser byUsername(Connection con, string username) {
-		auto cmd = Command(con, MYX_SEL_QUERY ~ " WHERE username=? LIMIT 1;");
-		cmd.prepare();
-
-		Variant[1] va;
-		va[0] = username;
-		cmd.bindParameters(va);
-
-		return ModelSet!GAUser(cmd);
+	Variant[] toVariant(bool includeId) {
+		return variantArray(username, password);
 	}
 
-	ModelSet!GAUser byId(Connection con, uint id) {
-		auto cmd = Command(con, MYX_SEL_QUERY ~ " WHERE id=? LIMIT 1;");
-		cmd.prepare();
+static:
+	const string MYX_SEL_QUERY = "SELECT * FROM ga_user";
+	const string MYX_INSERT =
+		"ga_user (username, password) VALUES (?, ?)";
+	const string MYX_UPDATE =
+		"ga_user SET username=?, password=?";
 
-		Variant[1] va;
-		va[0] = id;
-		cmd.bindParameters(va);
-
-		return ModelSet!GAUser(cmd);
+	ModelSet!GAUser byUsername(Connection con, string username) {
+		return Select.where!GAUser(
+			con, " WHERE username=? LIMIT 1;", Variant(username));
 	}
 
 	GAUser fromString(string str) {

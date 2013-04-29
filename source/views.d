@@ -13,7 +13,7 @@ void home(HttpServerRequest req, HttpServerResponse res) {
 	auto user = GAUser.fromString(req.session["user"]);
 	auto con = DBContainer.instance.lockConnection();
 
-	auto events = GAEvent.byUser(con, user);
+	auto events = Select.whereEquals!GAEvent(con, "uid", Variant(user.id));
 
 	res.render!("home.dt", events);
 }
@@ -55,5 +55,14 @@ void login(HttpServerRequest req, HttpServerResponse res) {
 }
 
 void showEvent(HttpServerRequest req, HttpServerResponse res) {
-	return;
+	auto user = GAUser.fromString(req.session["user"]);
+	auto con = DBContainer.instance.lockConnection();
+
+	auto events = Select.byId!GAEvent(con, to!uint(req.params["id"]));
+	if(events.empty) return;
+	auto event = events[0];
+
+	auto guests = GAGuest.byEvent(con, event);
+
+	res.render!("event.dt", user, event, guests);
 }

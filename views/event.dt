@@ -1,0 +1,38 @@
+extends layout_no_image
+
+block head
+	title
+		|= event.name
+		|  - Guestaware
+
+
+block content
+	.container.paper
+		.row
+			.span3
+				h2= event.name
+				p= event.venue
+			
+			.span9
+				table.table.table-hover
+					thead
+						tr
+							th Name
+							th Email
+							th Phone
+							th Note
+							th Checked in
+					- if(guests.empty)
+						p Oops, no guests
+
+					- else
+						- import models;
+						- foreach(ref GAGuest guest; guests)
+							tr
+								td= guest.name
+								td= guest.email
+								td= guest.phone
+								td= guest.note
+								td= guest.checked ? "Yes":"No"
+
+
